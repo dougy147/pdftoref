@@ -8,7 +8,7 @@
 destination="$HOME/articles"
 
 # création de la bibliothèque
-if ! [ -d $HOME/articles ]; then
+if ! [ -d $destination ]; then
 	mkdir $destination
 fi
 
@@ -87,18 +87,18 @@ verifier_que_doi_correspond_au_titre() {
 }
 
 
-si_veux_enregistrer_dans_la_BDD_et_ajouter_references_a_la_biblio() {
-	if [[ $(echo $2) = "-s" || $(echo $2) = "--save" ]]; then
-		$(echo "$1" >> "$destination/_biblio.bib")
-		$(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" -w "\\n" >> "$destination/_biblio.bib")
-		$(echo "" >> "$destination/_biblio.bib")
-		$(echo "$1" >> "$destination/ma_biblio_apa.tex")
-		$(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure" >> "$destination/ma_biblio_apa.tex")
-		$(echo "" >> "$destination/ma_biblio_apa.tex")
-		$(cp "$1" "$destination" 2> /dev/null)
-		#cp $1 $HOME/science/articles/
-	fi
-}
+#si_veux_enregistrer_dans_la_BDD_et_ajouter_references_a_la_biblio() {
+#	if [[ $(echo $2) = "-s" || $(echo $2) = "--save" ]]; then
+#		$(echo "$1" >> "$destination/_biblio.bib")
+#		$(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" -w "\\n" >> "$destination/_biblio.bib")
+#		$(echo "" >> "$destination/_biblio.bib")
+#		$(echo "$1" >> "$destination/ma_biblio_apa.tex")
+#		$(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure" >> "$destination/ma_biblio_apa.tex")
+#		$(echo "" >> "$destination/ma_biblio_apa.tex")
+"		$(cp "$1" "$destination" 2> /dev/null)
+#		#cp $1 $HOME/science/articles/
+#	fi
+#}
 
 ajout_bibliotheque() {
 	if [ -f $destination/$nom_fichier ]; then
@@ -156,7 +156,7 @@ echo "$1"
 if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") = "doi." ]]; then
 	#$(echo "$1" >> _biblio.bib)
 	echo ""
-	echo "Le doi pour "$1" a été trouvé : $doi"
+	echo "DOI for "$1" found : $doi"
 	echo ""
 	doi_epure=$(echo $doi | sed 's/doi://' | sed 's/http:\/\///' | sed "s/doi.org\///")
 	verifier_que_doi_correspond_au_titre "$1"
@@ -172,19 +172,19 @@ if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") 
 	nom_fichier=$(echo "$nom_fichier.pdf")
 	ajout_bibliotheque "$1"
 #	si_veux_enregistrer_dans_la_BDD_et_ajouter_references_a_la_biblio "$1" "$2"
-	if [[ $(echo $2) = "-s" || $(echo $2) = "--save" ]]; then
-		$(echo "$1" >> "$destination/_biblio.bib")
-		$(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" -w "\\n" >> "$destination/_biblio.bib")
-		$(echo "" >> "$destination/_biblio.bib")
-		$(echo "$1" >> "$destination/ma_biblio_apa.tex")
-		$(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure" >> "$destination/ma_biblio_apa.tex")
-		$(echo "" >> "$destination/ma_biblio_apa.tex")
-		$(cp "$1" "$destination" 2> /dev/null)
-		#cp $1 $HOME/science/articles/
-	fi
-	#$(curl -LH "Accept: text/bibliography; style=apa" "https://doi.org/$doi_epure" 2> /dev/null) | xargs xclip
-	#echo $(curl -s "http://api.crossref.org/works/$doi/transform/application/json" -w "\\n")
-	#$(echo "" >> _biblio.bib)
+#	if [[ $(echo $2) = "-s" || $(echo $2) = "--save" ]]; then
+#		$(echo "$1" >> "$destination/_biblio.bib")
+#		$(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" -w "\\n" >> "$destination/_biblio.bib")
+#		$(echo "" >> "$destination/_biblio.bib")
+#		$(echo "$1" >> "$destination/ma_biblio_apa.tex")
+#		$(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure" >> "$destination/ma_biblio_apa.tex")
+#		$(echo "" >> "$destination/ma_biblio_apa.tex")
+#		$(cp "$1" "$destination" 2> /dev/null)
+#		#cp $1 $HOME/science/articles/
+#	fi
+#	#$(curl -LH "Accept: text/bibliography; style=apa" "https://doi.org/$doi_epure" 2> /dev/null) | xargs xclip
+#	#echo $(curl -s "http://api.crossref.org/works/$doi/transform/application/json" -w "\\n")
+#	#$(echo "" >> _biblio.bib)
 #	$(mv "$source1/$1" "$destination/$1")
 else
 	titre_trouve=$(pdftitle -p "$1")
@@ -224,6 +224,7 @@ else
 				####echo "VOICI LE DOI EPURE : $doi_epure"
 				echo $(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure")
 				echo ""
+				ajout_bibliotheque "$1"
 			fi
 		else
 			#echo $(curl -LH "https://scholar.google.fr/scholar?q=$titre_trouve")
@@ -278,6 +279,7 @@ else
 					echo "Here are APA references (found on Crossref) : "
 					echo $(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure")
 					echo ""
+					ajout_bibliotheque "$1"
 				else
 					echo "erreur"
 					echo ""

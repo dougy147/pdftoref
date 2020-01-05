@@ -1,12 +1,12 @@
 # pdftoref
 
-Pdftoref extracts DOIs from .pdf files, outputs and saves references (BibTex and APA formats), and organizes/classes your articles in `$HOME/articles`.
+`pdftoref` extracts DOIs from .pdf files, outputs and saves references (BibTex and APA formats), and organizes/classes your articles in `$HOME/articles`.
 
 ## Getting Started
 
 ### Prerequisites
 
-Pdftoref should work out of the box. However, you may have to install some dependencies to make it work properly :
+`pdftoref` should work out of the box. However, you may have to install some dependencies to make it work properly :
 
 * pdftitle (necessites python) : see https://pypi.org/project/pdftitle/
 * zathura (pdf reader)
