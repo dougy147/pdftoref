@@ -4,8 +4,6 @@ Pdftoref extracts DOIs from .pdf files, outputs and saves references (BibTex and
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
 ### Prerequisites
 
 Pdftoref should work out of the box. However, you may have to install some dependencies to make it work properly :
@@ -38,5 +36,10 @@ And launch it using a pdf as first argument :
 sh pdftoref ~/downloads/article.pdf # supposing your pdf article is in the downloads folder
 ```
 
+# Examples
+
+Here's the result on `pdftoref` with a recent article.
+
 ![](images/example1.png)
 
+With the most conservative methodology, `pdftoref` is 85% accurate in finding references. It has been tested on a 155 pdf database (containing articles from year 1892 to 2019). 11 of them (7%) were mistaken with other articles. 13 of them (8%) have been found on Google Scholar only, but at the time, I have not been able to automatically extract references from a Google Scholar search in a proper manner (work in progress).
