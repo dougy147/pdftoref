@@ -21,7 +21,8 @@ sudo pacman -S zathura # or sudo apt install zathura
 To try `pdftoref`, you can clone this repository. For instance :
 
 ```
-git clone https://github.com/dougy147/pdftoref ~
+cd ~
+git clone https://github.com/dougy147/pdftoref
 ```
 
 Then, open your terminal and go to the folder you just cloned :
