@@ -2,7 +2,7 @@
 
 `pdftoref` extracts DOIs from .pdf files, outputs and saves references (BibTex and APA formats), and organizes/classes your articles in `$HOME/articles`.
 
-# What is does
+# What it does
 
 What `pdftoref` does first is (1) searches for a DOI in the pdf, (2) looks in Crossref for references thanks to DOI, (3) checks if the title found on Crossref matches the article's (if yes : saves references, places a copy of the article in `$HOME/articles` folder (author_year.pdf) ; if no : asks to enter the title manually).
 If DOI can't be found in pdf : (1) uses `pdftitle` (see below) to extract the title, (2) asks if found title matches the article's (if yes : saves references ; if no : asks to enter the title manually).
