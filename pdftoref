@@ -164,6 +164,7 @@ if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") 
 	apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 	echo ""
 	nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+	#nom_fichier=$(echo $apa_ref | sed 's/\,.*$//' | tr '[:upper:]' '[:lower:]')
 	nom_fichier=$(echo "$nom_fichier.pdf")
 	ajout_bibliotheque "$1"
 else
@@ -230,6 +231,7 @@ else
 				apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 				echo ""
 				nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+				#nom_fichier=$(echo $apa_ref | sed 's/\,.*$//' | tr '[:upper:]' '[:lower:]')
 				nom_fichier=$(echo "$nom_fichier.pdf")
 				ajout_bibliotheque "$1"
 			fi
@@ -289,6 +291,7 @@ else
 					apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 					echo ""
 					nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+					#nom_fichier=$(echo $apa_ref | sed 's/\,.*$//' | tr '[:upper:]' '[:lower:]')
 					nom_fichier=$(echo "$nom_fichier.pdf")
 					ajout_bibliotheque "$1"
 				else
