@@ -4,8 +4,8 @@
 
 # What it does
 
-What `pdftoref` does first is (1) searches for a DOI in the pdf, (2) looks in Crossref for references thanks to DOI, (3) checks if the title found on Crossref matches the article's (if yes : saves references, places a copy of the article in `$HOME/articles` folder (author_year.pdf) ; if no : asks to enter the title manually).
-If DOI can't be found in pdf : (1) uses `pdftitle` (see below) to extract the title, (2) asks if found title matches the article's (if yes : saves references ; if no : asks to enter the title manually).
+What `pdftoref` does first is **(1)** searches for a DOI in the pdf, **(2)** looks in Crossref for references thanks to DOI, **(3)** checks if the title found on Crossref matches the article's (if yes : saves references, places a copy of the article in `$HOME/articles` folder (author_year.pdf) ; if no : asks to enter the title manually).
+If DOI can't be found in pdf : **(1)** uses `pdftitle` (see below) to extract the title, **(2)** asks if found title matches the article's (if yes : saves references ; if no : asks to enter the title manually).
 
 It also automatically checks if the article is already in `$HOME/articles`. For an author who has published more than one paper during the same year, articles will not be confused (if they're really different articles, else `pdftoref` will pass), and the last article added to the `$HOME/articles` folder will be renamed this way : author_year_a.pdf.
 
