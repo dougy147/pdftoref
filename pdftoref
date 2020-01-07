@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+# Yes, this is messy !
+
 # rechercher le DOI à l'intérieur du .pdf et faire une recherche des infos via crossref
 # si l'argument n'est pas un pdf : quitter le script
 
@@ -65,13 +67,13 @@ entrer_le_titre_soi_meme() {
 
 prevenir_que_le_doi_n_est_peut_etre_pas_le_bon() {
 	#if [[
-	echo "It may be possible that the DOI we found in the pdf is not the article's one."
-	echo "It may the DOI of a quotation in the pdf."
+	echo "It is be possible that the DOI we found in the pdf is not the article's one."
+	echo "It may be the DOI of a quotation in the pdf."
 	obtenir_le_titre "$1"
 	echo "Can you confirm the article's title is '$titre_predit' ? (y/n) "
 	read reponse
 	if [[ $(echo $reponse) = "y" ]]; then
-		return
+		ajout_bibliotheque "$1"
 	else
 		entrer_le_titre_soi_meme "$1"
 	fi
@@ -94,7 +96,8 @@ ajout_bibliotheque() {
 		#echo $test_taille_destination_existante
 		if ! [[ $test_taille_fichier = $test_taille_destination_existante ]]; then
 			echo "Not the same size between the existing file ($test_taille_fichier)K and the one being processed ($test_taille_destination_existante)K. So, probably not the same paper."
-			nouveau_nom=$(echo $nom_fichier | sed 's/.pdf//')$(echo "a.pdf")
+			echo $nom_fichier
+			nouveau_nom=$(echo $nom_fichier | sed 's/.pdf/a.pdf/')
 			echo $nouveau_nom
 			cp "$1" $destination/$nouveau_nom
 			echo "$nouveau_nom" >> "$destination/_biblio.bib"
@@ -164,6 +167,9 @@ if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") 
 	apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 	echo ""
 	nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+	if [[ $(echo $nom_fichier) = "" ]]; then
+		nom_fichier=$(echo $bib_ref | grep -io "\@incollection{.*, doi" | sed "s/\@incollection{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+	fi
 	#nom_fichier=$(echo $apa_ref | sed 's/\,.*$//' | tr '[:upper:]' '[:lower:]')
 	nom_fichier=$(echo "$nom_fichier.pdf")
 	ajout_bibliotheque "$1"
@@ -231,6 +237,9 @@ else
 				apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 				echo ""
 				nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+				if [[ $(echo $nom_fichier) = "" ]]; then
+					nom_fichier=$(echo $bib_ref | grep -io "\@incollection{.*, doi" | sed "s/\@incollection{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+				fi
 				#nom_fichier=$(echo $apa_ref | sed 's/\,.*$//' | tr '[:upper:]' '[:lower:]')
 				nom_fichier=$(echo "$nom_fichier.pdf")
 				ajout_bibliotheque "$1"
@@ -291,6 +300,9 @@ else
 					apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 					echo ""
 					nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+					if [[ $(echo $nom_fichier) = "" ]]; then
+						nom_fichier=$(echo $bib_ref | grep -io "\@incollection{.*, doi" | sed "s/\@incollection{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+					fi
 					#nom_fichier=$(echo $apa_ref | sed 's/\,.*$//' | tr '[:upper:]' '[:lower:]')
 					nom_fichier=$(echo "$nom_fichier.pdf")
 					ajout_bibliotheque "$1"
