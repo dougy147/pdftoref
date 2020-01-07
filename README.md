@@ -17,7 +17,7 @@ It also automatically checks if the article is already in `$HOME/articles`. For 
 `pdftoref` should work out of the box. However, you may have to install some dependencies optimal use :
 
 * pdftitle (necessites python) : see https://pypi.org/project/pdftitle/
-* facultative : zathura (pdf reader). When `pdftoref` can't find the DOI, it looks for the title. If it can't extract it, you are proposed to open the file with zathura (did not manage to find a way to open the default pdf reader on the machine) <!--If it can't find the title, it prints a preview (20 first lines) in the terminal, so you can copy and paste it. -->
+* facultative : zathura (pdf reader). When `pdftoref` can't find the DOI, it looks for the title. If it can't extract it, you are asked if you want to open the file with zathura (did not manage to find a way to open the default pdf reader on the machine) <!--If it can't find the title, it prints a preview (20 first lines) in the terminal, so you can copy and paste it. -->
 
 #### For Ubuntu, Debian
 
