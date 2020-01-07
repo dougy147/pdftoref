@@ -2,6 +2,13 @@
 
 `pdftoref` extracts DOIs from .pdf files, outputs and saves references (BibTex and APA formats), and organizes/classes your articles in `$HOME/articles`.
 
+# What is does
+
+What `pdftoref` does first is (1) searches for a DOI in the pdf, (2) looks in Crossref for references thanks to DOI, (3) checks if the title found on Crossref matches the article's (if yes : saves references, places a copy of the article in `$HOME/articles` folder (author_year.pdf) ; if no : asks to enter the title manually).
+If DOI can't be found in pdf : (1) uses `pdftitle` (see below) to extract the title, (2) asks if found title matches the article's (if yes : saves references ; if no : asks to enter the title manually).
+
+It also automatically checks if the article is already in `$HOME/articles`. For an author who has published more than one paper during the same year, articles will not be confused (if they're really different articles, else `pdftoref` will pass), and the last article added to the `$HOME/articles` folder will be renamed this way : author_year_a.pdf.
+
 ## Getting Started
 
 ### Prerequisites
@@ -67,4 +74,4 @@ and `pdftoref` will iteratively check for references of all pdfs in the folder.
 
 # More info
 
-Tested passively with a 155 pdf database (containing articles from year 1892 to 2019), `pdftoref` is 85% accurate in finding references. It has been tested on a 155 pdf database (containing articles from year 1892 to 2019). 11 of them (7%) were mistaken with other articles (may be corrected by adding name of the author when searching with the title). 13 of them (8%) have been found on Google Scholar only, but at the time, I have not been able to automatically extract references from a Google Scholar search in a proper manner (work in progress).
+Tested passively on a 155 pdf database (containing articles from year 1892 to 2019), `pdftoref` is 85% accurate in finding references. 11 articles (7%) have been mistaken for other articles (may be corrected by adding name of the author when searching with the title). 13 articles (8%) have been found on Google Scholar only, but at the time, I have not been able to automatically extract references from a Google Scholar search (work in progress).
