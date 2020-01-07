@@ -4,7 +4,6 @@
 # rechercher le DOI à l'intérieur du .pdf et faire une recherche des infos via crossref
 # si l'argument n'est pas un pdf : quitter le script
 
-# je déclare d'abord les fonctions :
 destination="$HOME/articles"
 
 # création de la bibliothèque
@@ -12,6 +11,7 @@ if ! [ -d $destination ]; then
 	mkdir $destination
 fi
 
+# declaratoin des fonctions :
 fonction_recherche_doi_dans_le_fichier () {
 	if [[ $(echo "$1" | grep -io ".pdf") = ".pdf"  ]]; then
 		doi=$(exec pdfinfo "$1" | grep -io "doi:.*" | head -n 1)
@@ -78,7 +78,6 @@ prevenir_que_le_doi_n_est_peut_etre_pas_le_bon() {
 }
 
 verifier_que_doi_correspond_au_titre() {
-	#echo $doi_epure
 	doi_correspond=$(echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" ) | grep -i "$(pdftotext "$1" - | sed '20 q')")
 	#echo "voici le doi correspond : $doi_correspond"
 	if [[ $(echo $doi_correspond) = "" || $(echo $doi_correspond | grep -io "not found") = "not found"   ]]; then
@@ -87,19 +86,6 @@ verifier_que_doi_correspond_au_titre() {
 }
 
 
-#si_veux_enregistrer_dans_la_BDD_et_ajouter_references_a_la_biblio() {
-#	if [[ $(echo $2) = "-s" || $(echo $2) = "--save" ]]; then
-#		$(echo "$1" >> "$destination/_biblio.bib")
-#		$(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" -w "\\n" >> "$destination/_biblio.bib")
-#		$(echo "" >> "$destination/_biblio.bib")
-#		$(echo "$1" >> "$destination/ma_biblio_apa.tex")
-#		$(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure" >> "$destination/ma_biblio_apa.tex")
-#		$(echo "" >> "$destination/ma_biblio_apa.tex")
-"		$(cp "$1" "$destination" 2> /dev/null)
-#		#cp $1 $HOME/science/articles/
-#	fi
-#}
-
 ajout_bibliotheque() {
 	if [ -f $destination/$nom_fichier ]; then
 		test_taille_fichier=$(du "$1" | awk '{print $1}')
@@ -107,10 +93,36 @@ ajout_bibliotheque() {
 		test_taille_destination_existante=$(du "$destination/$nom_fichier" | awk '{print $1}')
 		#echo $test_taille_destination_existante
 		if ! [[ $test_taille_fichier = $test_taille_destination_existante ]]; then
-			echo "Not the same size between the existing file ($test_taille_fichier K) and the one being processed ($test_taille_destination_existante K). So, not the same paper."
+			echo "Not the same size between the existing file ($test_taille_fichier)K and the one being processed ($test_taille_destination_existante)K. So, probably not the same paper."
 			nouveau_nom=$(echo $nom_fichier | sed 's/.pdf//')$(echo "a.pdf")
 			echo $nouveau_nom
 			cp "$1" $destination/$nouveau_nom
+			echo "$nouveau_nom" >> "$destination/_biblio.bib"
+			echo "$nouveau_nom" >> "$destination/_biblio.apa"
+			echo "$bib_ref" >> "$destination/_biblio.bib"
+			echo "$apa_ref" >> "$destination/_biblio.apa"
+			echo "" >> "$destination/_biblio.bib"
+			echo "" >> "$destination/_biblio.apa"
+		else
+			echo "Paper already exists in folder $destination"
+			if [[ $(less "$destination/_biblio.bib" | grep -io "$nom_fichier") = "$nom_fichier" ]]; then
+				echo "BibTex references already exists. Verifying APA."
+			else
+				echo "$nom_fichier" >> "$destination/_biblio.bib"
+				echo "$bib_ref" >> "$destination/_biblio.bib"
+				echo "" >> "$destination/_biblio.bib"
+				echo "Adding BibTex references."
+			fi
+
+			if [[ $(less "$destination/_biblio.apa" | grep -io "$nom_fichier") = "$nom_fichier" ]]; then
+				echo "APA references already exists. Quit."
+			else
+				echo "$nom_fichier" >> "$destination/_biblio.apa"
+				echo "$bib_ref" >> "$destination/_biblio.apa"
+				echo "" >> "$destination/_biblio.apa"
+				echo "Adding APA references."
+			fi
+
 		fi
 	else
 	cp -n $1 $destination/$nom_fichier
@@ -129,23 +141,6 @@ ajout_bibliotheque() {
 
 fonction_recherche_doi_dans_le_fichier "$1"
 obtenir_le_titre "$1"
-
-####################################################################################################
-
-#if [[ $(echo $doi | grep -io "not found") = "not found" ]]; then
-#	echo "ne pas enregistrer le fichier dans la biblio et l'ignorer"
-#fi
-
-# On retire le "Title:" du titre recueilli
-# doi=$(echo "$doi" | cut -c17-100)
-
-# Si le titre n'est pas vide, alors on renomme le fichier, sinon on arrête
-
-#source1='/home/luc/articles/articles_backup/articles'
-#destination='/home/luc/articles/articles_backup/articles'
-
-#source1='/home/luc/science/articles/articles_sans_doi/articles_sans_nom_ni_doi'
-#destination='/home/luc/science/articles/'
 
 ####################################################################################################
 
@@ -171,22 +166,30 @@ if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") 
 	nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
 	nom_fichier=$(echo "$nom_fichier.pdf")
 	ajout_bibliotheque "$1"
-#	si_veux_enregistrer_dans_la_BDD_et_ajouter_references_a_la_biblio "$1" "$2"
-#	if [[ $(echo $2) = "-s" || $(echo $2) = "--save" ]]; then
-#		$(echo "$1" >> "$destination/_biblio.bib")
-#		$(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" -w "\\n" >> "$destination/_biblio.bib")
-#		$(echo "" >> "$destination/_biblio.bib")
-#		$(echo "$1" >> "$destination/ma_biblio_apa.tex")
-#		$(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure" >> "$destination/ma_biblio_apa.tex")
-#		$(echo "" >> "$destination/ma_biblio_apa.tex")
-#		$(cp "$1" "$destination" 2> /dev/null)
-#		#cp $1 $HOME/science/articles/
-#	fi
-#	#$(curl -LH "Accept: text/bibliography; style=apa" "https://doi.org/$doi_epure" 2> /dev/null) | xargs xclip
-#	#echo $(curl -s "http://api.crossref.org/works/$doi/transform/application/json" -w "\\n")
-#	#$(echo "" >> _biblio.bib)
-#	$(mv "$source1/$1" "$destination/$1")
 else
+	if [[ $(echo $(command -v pdftitle)) = "" ]]; then
+		PACMAN=$(which pacman)
+		APT=$(which apt)
+		YUM=$(which yum)
+		echo "Programs like 'python', 'pip' and 'pdftitle' are necessary to continue."
+		echo "Installing..."
+		if [[ ! -z $PACMAN ]]; then
+			sudo pacman -S python
+			sudo pacman -S python-pip
+			sudo pip install pdftitle
+		elif [[ ! -z $APT ]]; then
+			sudo apt install python
+			sudo apt install python-pip
+			sudo pip install pdftitle
+		elif [[ ! -z $YUM ]]; then
+			yum python
+			yum python-pip
+			sudo pip install pdftitle
+		else
+			echo "error can't install package $PACKAGE"
+			exit 1;
+		fi
+	fi
 	titre_trouve=$(pdftitle -p "$1")
 	#echo "$titre_trouve"
 	#echo "Le titre de l'article est-il '$titre_trouve' (fichier "$1") ? ((y)es / (n)o / (o)pen "
@@ -216,6 +219,7 @@ else
 				#echo $doi_epure
 				echo "Here are BibTex references (found on Crossref) : "
 				echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" )
+				bib_ref=$(echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" ))
 				echo ""
 				echo "Here are APA references (found on Crossref) : "
 				# souvent le doi va avoir "doi.org/" au début, nous le retirons ici
@@ -223,7 +227,10 @@ else
 				doi_epure=$(echo $doi | sed 's/doi://' | sed 's/http:\/\///' | sed "s/doi.org\///")
 				####echo "VOICI LE DOI EPURE : $doi_epure"
 				echo $(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure")
+				apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 				echo ""
+				nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+				nom_fichier=$(echo "$nom_fichier.pdf")
 				ajout_bibliotheque "$1"
 			fi
 		else
@@ -275,10 +282,14 @@ else
 					#echo "voici le doi epuré : $doi_epure"
 					echo "Here are BibTex references (found on Crossref) : "
 					echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" )
+					bib_ref=$(echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" ))
 					echo ""
 					echo "Here are APA references (found on Crossref) : "
 					echo $(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure")
+					apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
 					echo ""
+					nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
+					nom_fichier=$(echo "$nom_fichier.pdf")
 					ajout_bibliotheque "$1"
 				else
 					echo "erreur"
