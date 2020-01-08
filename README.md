@@ -35,7 +35,7 @@ pip install pdftitle
 sudo pacman -S zathura
 ```
 
-### Installing
+### Installing pdftoref
 
 To try `pdftoref`, you can clone this repository. For instance :
 
