@@ -62,7 +62,7 @@ If it doesn't work, try to add `sh` at the beginning of the line (e.g. `sh pdfto
 
 # Examples
 
-Here's the result on `pdftoref` with a recent article.
+Here's the result of `pdftoref` with a recent article.
 
 ![](images/example1.png)
 
