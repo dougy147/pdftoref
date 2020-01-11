@@ -10,6 +10,8 @@ If DOI can't be found : **(1)** uses `pdftitle` (see below) to extract the title
 
 When using the '-g' option, it automatically checks if the article is already in `$HOME/articles`. For an author who has published more than one paper during the same year, articles will not be confused (if they're really different articles, else `pdftoref` will pass), and the last article added to the `$HOME/articles` folder will be renamed this way : author_year_a.pdf.
 
+Will soon add an option to deactivate the "ask for title manually" sequence.
+
 ## Getting Started
 
 ### Prerequisites
