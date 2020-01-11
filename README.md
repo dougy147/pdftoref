@@ -1,6 +1,6 @@
 # pdftoref
 
-`pdftoref` extracts DOIs from .pdf files, outputs references (BibTex and APA formats). With the "-g" option, it saves references and organizes/classes your articles in `$HOME/articles`.
+`pdftoref` extracts DOIs from .pdf files, and outputs references (BibTex and APA formats). With the "-g" option, it saves references and organizes/classes your articles in `$HOME/articles`.
 
 # What it does
 
