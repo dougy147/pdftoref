@@ -77,4 +77,4 @@ and `pdftoref` will iteratively check for references of all pdfs in the folder.
 
 # More info
 
-Tested passively on a 155 pdf database (containing articles from year 1892 to 2019), `pdftoref` is 85% accurate in finding references. 11 articles (7%) have been mistaken for other articles (may be corrected by adding name of the author when searching with the title). 13 articles (8%) have been found on Google Scholar only, but at the time, I have not been able to automatically extract references from a Google Scholar search (work in progress).
+Tested passively on a 155 pdf database (containing articles from year 1892 to 2019), `pdftoref` is 85% accurate in finding references. 11 articles (7%) have been mistaken for other articles (may be corrected by adding name of the author when searching with the title). 13 articles (8%) have been found on Google Scholar only, but at the time, I have not been able to automatically extract references from a Google Scholar search (work in progress). 131 articles (85%) have been correctly identified.
