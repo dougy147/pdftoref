@@ -1,14 +1,16 @@
 # pdftoref
 
-`pdftoref` extracts DOIs from .pdf files, and outputs references (BibTex and APA formats). With the "-g" option, it saves references and organizes/classes your articles in `$HOME/articles`.
+`pdftoref` extracts DOIs from .pdf files, and outputs references (BibTex and APA formats). 
+
+With the `-g` option, it saves references and organizes/classes your articles in `$HOME/articles` (with this name format : "(author)(year).pdf").
 
 # What it does
 
-What `pdftoref` does first is **(1)** searches for a DOI in the pdf, **(2)** looks in Crossref for references thanks to DOI, **(3)** checks if the title found on Crossref matches the article's (if yes : outputs references ; if no : asks to enter the title manually).
+What `pdftoref` does first is **(1)** searches for a DOI in the pdf, **(2)** looks in Crossref for references thanks to DOI, **(3)** checks if the title found on Crossref matches the article's (if yes : outputs references ; if not sure : asks for a confirmation ; if no : asks to enter the title manually).
 
-If DOI can't be found : **(1)** uses `pdftitle` (see below) to extract the title, **(2)** asks if found title matches the article's (if yes : outputs references ; if no : asks to enter the title manually).
+If DOI can't be found : **(1)** uses `pdftitle` (see below) to extract the title, **(2)** asks if found title matches the article's (if yes : outputs references ; if not sure : asks for confirmation ; if no : asks to enter the title manually).
 
-When using the '-g' option, it automatically checks if the article is already in `$HOME/articles`. For an author who has published more than one paper during the same year, articles will not be confused (if they're really different articles, else `pdftoref` will pass), and the last article added to the `$HOME/articles` folder will be renamed this way : author_year_a.pdf.
+When using the `-g` option, it automatically checks if the article is already in `$HOME/articles`. If an author has published more than one paper during the same year, articles will not be confused (if they're really different articles, else `pdftoref` will pass), and the last article added to the `$HOME/articles` folder will be renamed this way : (author)(year)a.pdf.
 
 Will soon add an option to deactivate the "ask for title manually" sequence.
 
@@ -19,7 +21,7 @@ Will soon add an option to deactivate the "ask for title manually" sequence.
 `pdftoref` should work out of the box. However, you may have to install some dependencies for optimal use :
 
 * pdftitle (necessites python) : see https://pypi.org/project/pdftitle/
-* facultative : zathura (pdf reader). When `pdftoref` can't find the DOI, it looks for the title. If it can't extract it, you are asked if you want to open the file with zathura (did not manage to find a way to open the default pdf reader on the machine) <!--If it can't find the title, it prints a preview (20 first lines) in the terminal, so you can copy and paste it. -->
+* zathura (pdf reader). When `pdftoref` can't find the DOI, it looks for the title. If it can't extract it, you are asked if you want to open the file with zathura (did not manage to find a way to open the default pdf reader on the machine) <!--If it can't find the title, it prints a preview (20 first lines) in the terminal, so you can copy and paste it. -->
 
 #### For Ubuntu, Debian
 
@@ -37,7 +39,7 @@ pip install pdftitle
 sudo pacman -S zathura
 ```
 
-### Installing pdftoref
+# Installing pdftoref
 
 To try `pdftoref`, you can clone this repository. For instance :
 
@@ -73,7 +75,8 @@ If you want to extract references from a bunch of pdfs, go to the folder which c
 ```
 for x in *pdf ; do pdftoref "$x" ; done
 ```
-and `pdftoref` will iteratively check for references of all pdfs in the folder.
+
+and `pdftoref` will iteratively check for references of all pdfs in the folder. Don't forget the `-g` option to get your articles references' saved in `$HOME/articles`.
 
 # More info
 
