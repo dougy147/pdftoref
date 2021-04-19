@@ -1,8 +1,6 @@
 #!/bin/bash
 #
 
-# Yes, this is messy !
-
 # rechercher le DOI à l'intérieur du .pdf et faire une recherche des infos via crossref
 # si l'argument n'est pas un pdf : quitter le script
 
@@ -11,14 +9,14 @@ if [[ "$2" = "" ]]; then
 	argument=$1
 else
 	option=$1
-	echo $option
+	#echo $option
 	argument=$2
-	echo $argument
+	#echo $argument
 fi
 
 
 
-destination="$HOME/articles"
+destination="$HOME/papers"
 
 # création de la bibliothèque
 if ! [ -d $destination ]; then
@@ -27,7 +25,7 @@ if ! [ -d $destination ]; then
 	fi
 fi
 
-# declaratoin des fonctions :
+# declaration des fonctions :
 fonction_recherche_doi_dans_le_fichier () {
 	if [[ $(echo "$argument" | grep -io ".pdf") = ".pdf"  ]]; then
 		doi=$(exec pdfinfo "$argument" | grep -io "doi:.*" | head -n 1)
@@ -42,7 +40,7 @@ fonction_recherche_doi_dans_le_fichier () {
 						if ! [[ $(echo $doi | grep -io "doi:")  = "doi:" || $(echo $doi | grep -io "doi.")  = "doi."  ]]; then
 							doi=$(exec pdftotext "$argument" - | grep -io "doi:.*") ||
 							if ! [[ $(echo $doi | grep -io "doi:")  = "doi:" || $(echo $doi | grep -io "doi.")  = "doi."  ]]; then
-								echo "DOI introuvable. Recherche du titre en cours."
+								echo "DOI not found. Looking for title."
 								exit 1
 							fi
 						fi
@@ -52,7 +50,7 @@ fonction_recherche_doi_dans_le_fichier () {
 		fi
 	else
 		echo "Please specify a PDF file as first argument."
-		echo "For exemple : 'pdftoref ~/downloads/cook2014.pdf'"
+		echo "For exemple : 'pdftoref ~/downloads/paper.pdf'"
 		exit 1
 	fi
 }
@@ -60,35 +58,36 @@ fonction_recherche_doi_dans_le_fichier () {
 
 obtenir_le_titre() {
 	titre_predit=$(pdftitle -p "$argument")
-	#echo $titre_predit
 }
 
 
 entrer_le_titre_soi_meme() {
-	echo "-------- Here are the first 20 lines of the file '$argument' --------"
+	echo "--------------------------------------------------------------------------"
+	echo "--------- Here are the first 20 lines of the file '$argument' 	--------"
+	echo "--------------------------------------------------------------------------"
 	pdftotext "$argument" - | sed '21 q'
-	echo "---------------------------------------------------------------"
-	echo "Please type the article's title (type 'o' for opening file '$argument') :"
+	echo "----------------------------------------------------------------------------------"
+	echo "Please type the paper's title (type 'o' to open file '$argument') :	--------"
+	echo "----------------------------------------------------------------------------------"
 	read titre_propose
 	if [[ $(echo $titre_propose) = "o" ]]; then
-		exec $(st nohup 2> /dev/null zathura "$argument" > /tmp/nohup.out 2> /dev/null)
-		#exec $($TERM nohup 2> /dev/null zathura "$argument" > /tmp/nohup.out 2> /dev/null)
+		exec $(exec $TERM nohup 2> /dev/null zathura "$argument" > /tmp/nohup.out 2> /dev/null)
 		echo "---------------------------------------------------------------"
-		echo "Please type the article's title :"
+		echo "-------- Please type the paper's title :			-----"
+		echo "---------------------------------------------------------------"
 		read titre_propose
 	fi
 }
 
 prevenir_que_le_doi_n_est_peut_etre_pas_le_bon() {
-	#if [[
-	echo "It is be possible that the DOI we found in the pdf is not the article's one."
-	echo "It may be the DOI of a quotation in the pdf."
+	echo "It is possible that the DOI found in the pdf is not really the paper's one."
+	echo "It may be the DOI of a quotation inside the document."
 	obtenir_le_titre "$argument"
-	echo "Can you confirm the article's title is '$titre_predit' ? (y/n) "
+	echo "Can you confirm the paper's title is \"$titre_predit\" ? (y/n) "
 	read reponse
 	if [[ $(echo $reponse) = "y" ]]; then
 		if [[ $(echo $option) = $(echo "-g") ]]; then
-			echo "option '-g' demandé"
+			echo "option '-g' demandée"
 			ajout_bibliotheque "$argument"
 		fi
 	else
@@ -97,7 +96,7 @@ prevenir_que_le_doi_n_est_peut_etre_pas_le_bon() {
 }
 
 verifier_que_doi_correspond_au_titre() {
-	doi_correspond=$(echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" ) | grep -i "$(pdftotext "$argument" - | sed '20 q')")
+	doi_correspond=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0"  -sLH "accept: text/bibliography; style=bibtex" "https://dx.doi.org/$doi_epure" ) | grep -i "$(pdftotext "$argument" - | sed '20 q')")
 	#echo "voici le doi correspond : $doi_correspond"
 	if [[ $(echo $doi_correspond) = "" || $(echo $doi_correspond | grep -io "not found") = "not found"   ]]; then
 		prevenir_que_le_doi_n_est_peut_etre_pas_le_bon "$argument"
@@ -162,7 +161,6 @@ ajout_bibliotheque() {
 fonction_recherche_doi_dans_le_fichier "$argument"
 obtenir_le_titre "$argument"
 
-
 ####################################################################################################
 
 echo "#######################################################################################################"
@@ -177,12 +175,14 @@ if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") 
 	doi_epure=$(echo $doi | sed 's/doi://' | sed 's/http:\/\///' | sed "s/doi.org\///")
 	verifier_que_doi_correspond_au_titre "$argument"
 	echo "Here are BibTex references (found on Crossref) : "
-	echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" )
-	bib_ref=$(echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" ))
+	#echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=bibtex" "https://dx.doi.org/$doi_epure" )
+	bib_ref=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=bibtex" "https://dx.doi.org/$doi_epure" ))
+	echo $bib_ref
 	echo ""
 	echo "Here are APA references (found on Crossref) : "
-	echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure")
-	apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
+	#echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=apa" 2> /dev/null "https://dx.doi.org/$doi_epure")
+	apa_ref=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=apa" 2> /dev/null "https://dx.doi.org/$doi_epure"))
+	echo $apa_ref
 	echo ""
 	nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
 	if [[ $(echo $nom_fichier) = "" ]]; then
@@ -222,21 +222,17 @@ else
 	titre_trouve=$(pdftitle -p "$argument")
 	#echo "$titre_trouve"
 	#echo "Le titre de l'article est-il '$titre_trouve' (fichier "$argument") ? ((y)es / (n)o / (o)pen "
-	echo "Cannot extract DOI from article '$argument'"
-	echo "Is article's title '$titre_trouve' (file "$argument") ? (y/n) "
+	echo "Cannot extract DOI from paper '$argument'"
+	echo "Is paper's title '$titre_trouve' (file "$argument") ? (y/n) "
 	read reponse_titre
 	if [[ $reponse_titre = $(echo $reponse_titre | grep -io "y") ]]; then
 		# crossref n'aime pas les accents (à,é,è) : on les supprime avec 'iconv' et 'translit'
 		# puis on remplace les 'espaces' par des '+' car crossref ne les change pas automatiquement
 		recherche=$(echo $titre_trouve | sed "s/'/\ /g" | sed 's/\ /+/g' | iconv -f utf8 -t ascii//TRANSLIT)
-		#echo "Nous allons rechercher '$recherche' sur Crossref ou sur Google Scholar"
-		#echo "Veuillez patienter"
-		#echo "https://search.crossref.org/?q=$recherche"
-		#echo $(curl -s "https://search.crossref.org/?q=$recherche")
-		if [[ $(echo $(curl -s "https://search.crossref.org/?q=$recherche") | grep -io "$titre_trouve" | head -n 1) = "$titre_trouve" ]]; then
+		if [[ $(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -s "https://search.crossref.org/?q=$recherche") | grep -io "$titre_trouve" | head -n 1) = "$titre_trouve" ]]; then
 			#echo "Le titre a été trouvé"
 			#echo "maintenant il faut trouver le DOI ... en cours de construction (difficile à scrapper)"
-			doi=$(echo $(curl -s "https://search.crossref.org/?q=$recherche" | grep -io "https://doi.*" | grep -io "doi.*" | head -n 2 | tail -n 1))
+			doi=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -s "https://search.crossref.org/?q=$recherche" | grep -io "https://doi.*" | grep -io "doi.*" | head -n 2 | tail -n 1))
 			echo $doi
 			if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") = "doi." ]]; then
 				#echo ""
@@ -247,16 +243,18 @@ else
 				verifier_que_doi_correspond_au_titre "$argument"
 				#echo $doi_epure
 				echo "Here are BibTex references (found on Crossref) : "
-				echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" )
-				bib_ref=$(echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" ))
+				#echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=bibtex" "https://dx.doi.org/$doi_epure" )
+				bib_ref=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=bibtex" "https://dx.doi.org/$doi_epure" ))
+				echo $bib_ref
 				echo ""
 				echo "Here are APA references (found on Crossref) : "
 				# souvent le doi va avoir "doi.org/" au début, nous le retirons ici
 				### ! ! ! ! doi_epure=$(echo $doi_epure | sed 's/.*[\:\ ]//' | grep -io "/.*" | sed 's/\///')
 				doi_epure=$(echo $doi | sed 's/doi://' | sed 's/http:\/\///' | sed "s/doi.org\///")
 				####echo "VOICI LE DOI EPURE : $doi_epure"
-				echo $(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure")
-				apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
+				#echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "Accept: text/bibliography; style=apa" 2> /dev/null "https://dx.doi.org/$doi_epure")
+				apa_ref=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=apa" 2> /dev/null "https://dx.doi.org/$doi_epure"))
+				echo $apa_ref
 				echo ""
 				nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
 				if [[ $(echo $nom_fichier) = "" ]]; then
@@ -270,7 +268,7 @@ else
 				fi
 			fi
 		else
-			#echo $(curl -LH "https://scholar.google.fr/scholar?q=$titre_trouve")
+			#echo $(curl -sLH "https://scholar.google.fr/scholar?q=$titre_trouve")
 			echo "Cannot find the article on Crossref. Trying with Google Scholar... See your browser (temporary solution)"
 			exec $BROWSER "https://scholar.google.fr/scholar?q=$titre_trouve"
 			echo ""
@@ -289,8 +287,7 @@ else
 		echo "Please type the article's title (type 'o' to open '$argument') :"
 		read titre_propose
 		if [[ $(echo $titre_propose) = "o" ]]; then
-			exec $(st nohup 2> /dev/null zathura "$argument" > /tmp/nohup.out 2> /dev/null)
-			#exec $($TERM nohup 2> /dev/null zathura "$argument" > /tmp/nohup.out 2> /dev/null)
+			exec $(exec $TERM nohup 2> /dev/null zathura "$argument" > /tmp/nohup.out 2> /dev/null)
 			echo "---------------------------------------------------------------"
 			echo "Type article's title :"
 			read titre_propose
@@ -303,10 +300,10 @@ else
 		#echo "https://search.crossref.org/?q=$recherche"
 		# crossref n'aime pas les accents (à,é,è)
 		#echo $(curl -s "https://search.crossref.org/?q=$recherche")
-		if [[ $(echo $(curl -s "https://search.crossref.org/?q=$recherche") | grep -io "$titre_propose" | head -n 1) = "$titre_propose" ]]; then
+		if [[ $(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -s "https://search.crossref.org/?q=$recherche") | grep -io "$titre_propose" | head -n 1) = "$titre_propose" ]]; then
 			echo "Title has been found."
 			echo "Extracting DOI..."
-			doi=$(echo $(curl -s "https://search.crossref.org/?q=$recherche" | grep -io "https://doi.*" | grep -io "doi.*" | head -n 2 | tail -n 1))
+			doi=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -s "https://search.crossref.org/?q=$recherche" | grep -io "https://doi.*" | grep -io "doi.*" | head -n 2 | tail -n 1))
 				if [[ $(echo $doi | grep -io "doi:") = "doi:" || $(echo $doi | grep -io "doi.") = "doi." ]]; then
 					echo ""
 					echo "DOI for "$argument" found : $doi"
@@ -317,12 +314,14 @@ else
 					verifier_que_doi_correspond_au_titre "$argument"
 					#echo "voici le doi epuré : $doi_epure"
 					echo "Here are BibTex references (found on Crossref) : "
-					echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" )
-					bib_ref=$(echo $(curl -s "http://api.crossref.org/works/$doi_epure/transform/application/x-bibtex" ))
+					#echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "accept: text/bibliography; style=bibtex" "https://dx.doi.org/$doi_epure" )
+					bib_ref=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0"  -LH "accept: text/bibliography; style=bibtex" "https://dx.doi.org/$doi_epure"))
+					echo $bib_ref
 					echo ""
 					echo "Here are APA references (found on Crossref) : "
-					echo $(curl -LH "Accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure")
-					apa_ref=$(echo $(curl -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://doi.org/$doi_epure"))
+					#echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -sLH "Accept: text/bibliography; style=apa" 2> /dev/null "https://dx.doi.org/$doi_epure")
+					apa_ref=$(echo $(curl -A "Mozilla/5.0 (x11; ubuntu; linux x86_64; rv:59.0) gecko/20100101 firefox/59.0" -LH "accept: text/bibliography; style=apa" 2> /dev/null "https://dx.doi.org/$doi_epure"))
+					echo $apa_ref
 					echo ""
 					nom_fichier=$(echo $bib_ref | grep -io "\@article{.*, doi" | sed "s/\@article{//g" | sed 's/,\ doi//' | sed 's/\_//' | tr '[:upper:]' '[:lower:]')
 					if [[ $(echo $nom_fichier) = "" ]]; then

@@ -1,16 +1,22 @@
 # pdftoref
 
-`pdftoref` extracts DOIs from .pdf files, and outputs references (BibTex and APA formats). 
+`pdftoref` extracts DOIs from .pdf files, and outputs references (BibTex and APA formats).
 
-With the `-g` option, it saves references and organizes/classes your articles in `$HOME/articles` (with this name format : "(author)(year).pdf").
+With the `-g` option, it saves references and organizes/classes your papers in `$HOME/papers` (with this name format : "(author)(year).pdf").
 
 # What it does
 
-What `pdftoref` does first is **(1)** searches for a DOI in the pdf, **(2)** looks in Crossref for references thanks to DOI, **(3)** checks if the title found on Crossref matches the article's (if yes : outputs references ; if not sure : asks for a confirmation ; if no : asks to enter the title manually).
+What `pdftoref` does first is
+- **(1)** searches for a DOI in the pdf
+- **(2)** looks in Crossref for references thanks to DOI
+- **(3)** checks if the title found on Crossref matches the paper's (if yes : outputs references ; if not sure : asks for a confirmation ; if no : asks to enter the title manually).
 
-If DOI can't be found : **(1)** uses `pdftitle` (see below) to extract the title, **(2)** asks if found title matches the article's (if yes : outputs references ; if not sure : asks for confirmation ; if no : asks to enter the title manually).
+If DOI can't be found :
+- **(1)** uses `pdftitle` (see below) to extract the title
+- **(2)** asks if found title matches the paper's (if yes : outputs references ; if not sure : asks for confirmation ; if no : asks to enter the title manually).
 
-When using the `-g` option, it automatically checks if the article is already in `$HOME/articles`. If an author has published more than one paper during the same year, articles will not be confused (if they're really different articles, else `pdftoref` will pass), and the last article added to the `$HOME/articles` folder will be renamed this way : (author)(year)a.pdf.
+
+When using the `-g` option, it automatically checks if the paper is already in `$HOME/papers`. If an author has published more than one paper during the same year, papers will not be confused (if they're really different papers, else `pdftoref` will pass), and the last paper added to the `$HOME/papers` folder will be renamed this way : (author)(year)a.pdf.
 
 Will soon add an option to deactivate the "ask for title manually" sequence.
 
@@ -59,14 +65,14 @@ cd ~/pdftoref
 And launch it using a pdf as first argument :
 
 ```
-pdftoref ~/downloads/article.pdf #supposing your pdf article is in the downloads folder
+pdftoref ~/downloads/paper.pdf #supposing your pdf paper is in the downloads folder
 ```
 
-If it doesn't work, try to add `sh` at the beginning of the line (e.g. `sh pdftoref ~/downloads/article.pdf`).
+If it doesn't work, try to add `sh` at the beginning of the line (e.g. `sh pdftoref ~/downloads/paper.pdf`).
 
 # Examples
 
-Here's the result of `pdftoref` with a recent article.
+Here's the result of `pdftoref` with a recent paper.
 
 ![](images/example1.png)
 
@@ -76,8 +82,8 @@ If you want to extract references from a bunch of pdfs, go to the folder which c
 for x in *pdf ; do pdftoref "$x" ; done
 ```
 
-and `pdftoref` will iteratively check for references of all pdfs in the folder. Don't forget the `-g` option to get your articles references' saved in `$HOME/articles`.
+and `pdftoref` will iteratively check for references of all pdfs in the folder. Don't forget the `-g` option to get your papers references' saved in `$HOME/papers`.
 
 # More info
 
-Tested passively on a 155 pdf database (containing articles from year 1892 to 2019), `pdftoref` is 85% accurate in finding references. 11 articles (7%) have been mistaken for other articles (may be corrected by adding name of the author when searching with the title). 13 articles (8%) have been found on Google Scholar only, but at the time, I have not been able to automatically extract references from a Google Scholar search (work in progress). 131 articles (85%) have been correctly identified.
+Tested passively on a 155 pdf database (containing papers from year 1892 to 2019), `pdftoref` is 85% accurate in finding references. 11 papers (7%) have been mistaken with other papers (may be corrected by adding name of the author when searching with the title). 13 papers (8%) have been found on Google Scholar only, but at the time, I have not been able to automatically extract references from a Google Scholar search (work in progress). 131 papers (85%) have been correctly identified.
